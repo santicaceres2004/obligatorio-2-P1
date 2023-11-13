@@ -10,7 +10,7 @@ class Sistema {
         this.listaExperiencias.push(unaExperiencia)
     }
 
-    agregarCategorias(unaCategoria) { 
+    agregarCategoria(unaCategoria) { 
         this.listaCategorias.push(unaCategoria)
     }
 
