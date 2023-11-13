@@ -15,13 +15,13 @@ function inicio() {
 
 
 function agregarCategoria() {
-    let formularioCategoria = document.getElementById('idFormExperiencia');
+    let formularioCategoria = document.getElementById('idFormCategoria');
     if (formularioCategoria.reportValidity()) {
         let nombre = document.getElementById('idNombreCategoria').value;
         let detalle = document.getElementById('idDetallesCategoria').value;
         sistema.agregarCategoria(new Categoria(nombre, detalle))
         formularioCategoria.reset();
-        cargarCombos();
+        cargarCombosCategoria();
     }
 }
 
@@ -35,12 +35,39 @@ function agregarExperiencia() {
         let categoria = document.getElementById('idCategoriaExperiencia').value;
         sistema.agregarExperiencia(new Experiencia(titulo, descripcion, precio, cantidad, categoria))
         formularioExperiencia.reset(); 
+        cargarCombosExperiencia();
     }
 }   
 
-function cargarCombos() {
+function cargarCombosCategoria() {
     let combo = document.getElementById('idComboCategoriasAbajo');
     combo.innerHTML = '';
+    let categorias = sistema.devolverCategorias();
+    for (let unaCategoria of categorias) {
+        let nodoTexto = document.createTextNode(unaCategoria.nombre);
+        let nodoOption = document.createElement('option');
+        nodoOption.value = unaCategoria.nombre;
+        nodoOption.appendChild(nodoTexto);
+        combo.appendChild(nodoOption);
+    }
+}
+
+function cargarCombosExperiencia() {
+    let comboExperiencia = document.getElementById('idCategoriaExperiencia');
+    comboExperiencia.innerHTML = '';
+    let categorias = sistema.devolverCategorias();
+    for (let unaCategoria of categorias) {
+        let nodoTexto = document.createTextNode(unaCategoria.nombre);
+        let nodoOption = document.createElement('option');
+        nodoOption.value = unaCategoria.nombre;
+        nodoOption.appendChild(nodoTexto);
+        combo.appendChild(nodoOption);
+    }
+}
+
+function cargarCombosFiltro() {
+    let comboFiltro = document.getElementById('idComboCategoriasIzquierda');
+    comboFiltro.innerHTML = '';
     let categorias = sistema.devolverCategorias();
     for (let unaCategoria of categorias) {
         let nodoTexto = document.createTextNode(unaCategoria.nombre);
