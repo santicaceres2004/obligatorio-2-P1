@@ -7,11 +7,10 @@ function inicio() {
     document.getElementById('idBotonBajaCategoria').addEventListener('click', eliminarCategoria);
     document.getElementById('idBotonAltaExperiencia').addEventListener('click', agregarExperiencia);
     document.getElementById('idBotonBajaExperiencia').addEventListener('click', eliminarExperiencia);
-
-
+    document.getElementById("idBotonComprar").addEventListener("click", agregarComprador);
 }
 
-                                                            // AGREGAR CATEGORIAS Y EXPERIENCIAS
+                                                            // AGREGAR CATEGORIAS, EXPERIENCIAS Y COMPRADORES
 
 function agregarCategoria() {
     let formularioCategoria = document.getElementById('idFormCategoria');
@@ -27,7 +26,16 @@ function agregarCategoria() {
         }
     }
 }
+function agregarComprador() {
+    let formularioComprador = document.getElementById("idFormCompra");
+    if (formularioComprador.reportValidity()) {
+        let nombreComprador = document.getElementById("idNombreComprador").value.toUpperCase();
+        let mailComprador = document.getElementById("idMail").value.toUpperCase();
+        let compra = 
+        sistema.agregarCompradores(new Comprador(nombreComprador,mailComprador,experiencia));
+    }
 
+}
 
 function agregarExperiencia() {
     let formularioExperiencia = document.getElementById('idFormExperiencia');
@@ -37,12 +45,14 @@ function agregarExperiencia() {
         let precio = document.getElementById('idPrecioExperiencia').value;
         let cantidad = document.getElementById('idCantidadPersonasExperiencia').value;
         let categoria = document.getElementById('idCategoriaExperiencia').value;
-        
+        if(sistema.existeExperienciaIgual(titulo,descripcion,precio)) {
+            alert ("Ya hay una experiencia indentica")
+        } else {
         sistema.agregarExperiencia(new Experiencia(titulo, descripcion, precio, cantidad, categoria));
         formularioExperiencia.reset();
         actualizarTablaExperiencias();
         actualizarCombosTotales ();
-
+        }
     }
 }
 
@@ -129,6 +139,7 @@ function eliminarCategoria() {
     }
 }
 
+
 function eliminarExperiencia() {
     let posEligido = document.getElementById('idComboBajaExperiencia').selectedIndex;
     
@@ -136,7 +147,7 @@ function eliminarExperiencia() {
         let experienciaAEliminar = sistema.devolverExperiencias()[posEligido];
         let categoriaExperiencia = experienciaAEliminar.categoria;
 
-        if (sistema.existeCategoriaEnExperiencias(categoriaExperiencia)) {
+        if (sistema.existeExperienciaComprada(categoriaExperiencia)) {
             alert('No puedes eliminar esta experiencia porque la categoría está en uso.');
         } else {
             sistema.eliminarExperiencia(posEligido);
@@ -155,38 +166,76 @@ function actualizarTablaExperiencias() {
     tablaExperiencia.innerHTML = '';
     let experiencias = sistema.devolverExperiencias();
 
+    let contadorUl = 1;
+
     if (experiencias.length === 0) {
         tablaExperiencia.innerHTML = "No hay experiencias";
     } else {
-        for (let i=0; ; i+2) { //cambiar for normal de a 2 - let unaExperiencia of experiencias
+        for (let i = 0; i < experiencias.length; i += 2) { 
             let fila = tablaExperiencia.insertRow();
 
-            let celdaLista = fila.insertCell(i);
+                            // Primer celda
+            let celdaLista1 = fila.insertCell();
+            celdaLista1.addEventListener("click", sistema.listaExperiencias.titulo)
+            let lista1 = document.createElement('ul');
+            let unaExperiencia1 = experiencias[i];
 
-            let lista = document.createElement('ul');
+            lista1.id = 'ul_' + contadorUl; 
+            contadorUl++;
+            
 
-            let liTitulo = document.createElement('li');
-            liTitulo.textContent = unaExperiencia.titulo;
-            lista.appendChild(liTitulo);
+            let liTitulo1 = document.createElement('li');
+            liTitulo1.textContent = unaExperiencia1.titulo;
+            liTitulo1.idName = "experienciaTitulo";
+            lista1.appendChild(liTitulo1);
 
-            let liDescripcion = document.createElement('li');
-            liDescripcion.textContent = unaExperiencia.descripcion;
-            liDescripcion.class = 'experienciasDescripcion';
-            lista.appendChild(liDescripcion);
+            let liDescripcion1 = document.createElement('li');
+            liDescripcion1.textContent = unaExperiencia1.descripcion;
+            liDescripcion1.className = 'experienciasDescripcion'; 
+            lista1.appendChild(liDescripcion1);
 
-            let liPrecio = document.createElement('li');
-            liPrecio.textContent = "$" + unaExperiencia.precio;
-            lista.appendChild(liPrecio);
+            let liPrecio1 = document.createElement('li');
+            liPrecio1.textContent = "$" + unaExperiencia1.precio;
+            lista1.appendChild(liPrecio1);
 
-            celdaLista.appendChild(lista);
+            celdaLista1.appendChild(lista1);
 
-            let cantidadPersonasSeleccionado = document.getElementById('idCantidadPersonasExperiencia').value;
+            
+            if (i + 1 < experiencias.length) {
+                let celdaLista2 = fila.insertCell();
+                celdaLista2.addEventListener("click", valorExperiencia);
+                let lista2 = document.createElement('ul');
+                let unaExperiencia2 = experiencias[i + 1];
 
-            let imagen = document.createElement('img');
+                lista2.id = 'ul_' + contadorUl; 
+                contadorUl++;
 
-            // ... ?
+
+                let liTitulo2 = document.createElement('li');
+                liTitulo2.textContent = unaExperiencia2.titulo;
+                liTitulo2.idName = "experienciaTitulo";
+                lista2.appendChild(liTitulo2);
+
+                let liDescripcion2 = document.createElement('li');
+                liDescripcion2.textContent = unaExperiencia2.descripcion;
+                liDescripcion2.className = 'experienciasDescripcion'; 
+                lista2.appendChild(liDescripcion2);
+
+                let liPrecio2 = document.createElement('li');
+                liPrecio2.textContent = "$" + unaExperiencia2.precio;
+                lista2.appendChild(liPrecio2);
+
+                celdaLista2.appendChild(lista2);
+            }
         }
     }
 }
+
+
+function valorExperiencia() {
+    let valor = liTitulo1.getElementById()
+}
+
+
 
 
