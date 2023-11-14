@@ -60,3 +60,16 @@ th, td {border: 1px solid blue;
 article{padding:3px;
 		margin:10px;}
 
+ul {
+	list-style-type: none; 
+	padding: 0; 
+	margin: 0; 
+}
+
+.experienciasDescripcion {
+    font-style: italic;
+}
+
+td:hover {
+	background-color: #f29f05;
+}
