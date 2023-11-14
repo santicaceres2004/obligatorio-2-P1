@@ -58,9 +58,33 @@ class Sistema {
         return existe;
     }
 
-    agregarCompradores() {
+    agregarCompradores(unComprador) {
         this.listaCompradores.push(unComprador)
     }
+
+    existeExperienciaIgual(unTitulo,unaDescripcion,unPrecio) {
+        let existe = false;
+        for(let pos = 0; pos<this.listaExperiencias.length&&!existe; pos++){
+            let titEnExp = this.listaExperiencias[pos];
+            if (titEnExp.titulo == unTitulo && titEnExp.descripcion == unaDescripcion && titEnExp.precio == unPrecio){
+                existe=true;
+            }
+        }
+        return existe;
+    } 
+
+    existeExperienciaComprada(unaExperiencia) {
+        let existe = false;
+        for (let pos = 0; pos<this.listaCompradores.length&&existe;pos++){
+            let experienciaComprada = this.listaCompradores[pos];
+            if(experienciaComprada.compra == unaExperiencia) {
+                existe = true
+            }
+        }
+        return existe;
+    }
+
+
 }
 
 class Categoria {
@@ -87,10 +111,10 @@ class Experiencia {
 }
 
 class Comprador {
-    constructor(unNombre,unMail) { 
+    constructor(unNombre,unMail,unaCompra) { 
         this.nombre = unNombre;
         this.mail = unMail
-
+        this.compra = unaCompra
     }
 }
 
