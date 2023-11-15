@@ -71,5 +71,14 @@ ul {
 }
 
 td:hover {
-	background-color: #f29f05;
+	background-color: #fbcc74;
+}
+
+.opcionSeleccionada {
+	background-color:  #f29f05;
+}
+
+.fondoBlanco {
+	background-color: white
+
 }
