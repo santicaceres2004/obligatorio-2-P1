@@ -5,6 +5,7 @@ class Sistema {
         this.listaExperiencias = new Array();
         this.listaCategorias = new Array();
         this.listaCompradores = new Array();
+        // this.listaExperienciasComprada = new Array();
     }
 
     agregarExperiencia(unaExperiencia) { 
@@ -62,11 +63,11 @@ class Sistema {
         this.listaCompradores.push(unComprador)
     }
 
-    existeExperienciaIgual(unTitulo,unaDescripcion,unPrecio) {
+    existeExperienciaIgual(unTitulo) {
         let existe = false;
         for(let pos = 0; pos<this.listaExperiencias.length&&!existe; pos++){
             let titEnExp = this.listaExperiencias[pos];
-            if (titEnExp.titulo == unTitulo && titEnExp.descripcion == unaDescripcion && titEnExp.precio == unPrecio){
+            if (titEnExp.titulo == unTitulo){
                 existe=true;
             }
         }
