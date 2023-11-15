@@ -84,7 +84,24 @@ class Sistema {
         return existe;
     }
 
+    ordenarCopiaExpPorPrecio () {
+        let copia = new Array() ;
+        for (let unaExperiencia of this.listaExperiencias){
+            copia.push(unaExperiencia)
+        }
+        return copia.sort(function (a,b) {return a.compararPrecio(b);})
 
+    }
+
+    devolverExpPorCat (NombreunaCategoria) {
+        let copia = new Array() ;
+        for (let unaExperiencia of this.listaExperiencias){
+            if(unaExperiencia.categoria.nombre == NombreunaCategoria)
+            copia.push(unaExperiencia)
+        }
+        return copia;
+
+    }
 }
 
 class Categoria {
@@ -106,6 +123,16 @@ class Experiencia {
         this.precio = unPrecio;
         this.cantidad = unaCantidad;
         this.categoria = unaCategoria;
+    }
+
+    compararPrecio (otraExperiencia) {
+        return this.precio - otraExperiencia.precio;
+
+    }
+
+    // no usado todavia
+    compararPersonas(otraExperiencia) {
+        return this.cantidad - otraExperiencia.cantidad; //(los valores son string)
     }
 
 }
