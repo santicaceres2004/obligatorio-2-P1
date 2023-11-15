@@ -31,8 +31,13 @@ function agregarComprador() {
     if (formularioComprador.reportValidity()) {
         let nombreComprador = document.getElementById("idNombreComprador").value.toUpperCase();
         let mailComprador = document.getElementById("idMail").value.toUpperCase();
-        let compra = 
-        sistema.agregarCompradores(new Comprador(nombreComprador,mailComprador,experiencia));
+        if (experienciaSeleccionada){
+            sistema.agregarCompradores(new Comprador(nombreComprador,mailComprador,experienciaSeleccionada));
+            experienciaSeleccionada = null
+        } else {
+            alert ('Tienes que elejir una experiencia para comprar')
+        }
+        formularioComprador.reset();
     }
 
 }
@@ -46,11 +51,11 @@ function agregarExperiencia() {
         let cantidad = document.getElementById('idCantidadPersonasExperiencia').value;
         let categoria = document.getElementById('idCategoriaExperiencia').value;
         if(sistema.existeExperienciaIgual(titulo,descripcion,precio)) {
-            alert ("Ya hay una experiencia indentica")
+            alert ("Ya hay una experiencia identica")
         } else {
         sistema.agregarExperiencia(new Experiencia(titulo, descripcion, precio, cantidad, categoria));
         formularioExperiencia.reset();
-        actualizarTablaExperiencias();
+        actualizarTablaExperiencias(sistema.devolverExperiencias());
         actualizarCombosTotales ();
         }
     }
@@ -99,7 +104,24 @@ function cargarCombosFiltro() {
         nodoOption.appendChild(nodoTexto);
         comboFiltro.appendChild(nodoOption); 
     }
+
+
+       comboFiltro.addEventListener('change', cargarExperiencias);
+        
+
+
 }
+
+function cargarExperiencias(){
+    let comboFiltro = document.getElementById('idComboCategoriasIzquierda');
+    let seleccion = comboFiltro.value;
+    let experienciasPorCategoria = sistema.devolverExpPorCat(seleccion);
+    actualizarTablaExperiencias(experienciasPorCategoria);    
+}
+
+
+
+
 
 function comboEliminarExperiencia(){
     let comboEliminarExperiencia = document.getElementById('idComboBajaExperiencia');
@@ -161,12 +183,12 @@ function eliminarExperiencia() {
 
                                                             // TABLA EXPERIENCIAS
 
-function actualizarTablaExperiencias() {
+function actualizarTablaExperiencias(experiencias) {
     let tablaExperiencia = document.getElementById('idTabla');
     tablaExperiencia.innerHTML = '';
-    let experiencias = sistema.devolverExperiencias();
+    // experiencias = sistema.devolverExperiencias();
 
-    let contadorUl = 1;
+    let contadorTd = 1;
 
     if (experiencias.length === 0) {
         tablaExperiencia.innerHTML = "No hay experiencias";
@@ -174,19 +196,14 @@ function actualizarTablaExperiencias() {
         for (let i = 0; i < experiencias.length; i += 2) { 
             let fila = tablaExperiencia.insertRow();
 
-                            // Primer celda
+            // Primer celda
             let celdaLista1 = fila.insertCell();
-            celdaLista1.addEventListener("click", sistema.listaExperiencias.titulo)
             let lista1 = document.createElement('ul');
             let unaExperiencia1 = experiencias[i];
 
-            lista1.id = 'ul_' + contadorUl; 
-            contadorUl++;
-            
-
             let liTitulo1 = document.createElement('li');
             liTitulo1.textContent = unaExperiencia1.titulo;
-            liTitulo1.idName = "experienciaTitulo";
+            liTitulo1.id = "experienciaTitulo";  // Cambiado de idName a id
             lista1.appendChild(liTitulo1);
 
             let liDescripcion1 = document.createElement('li');
@@ -196,24 +213,49 @@ function actualizarTablaExperiencias() {
 
             let liPrecio1 = document.createElement('li');
             liPrecio1.textContent = "$" + unaExperiencia1.precio;
+
+            let comboCantidad1 = document.getElementById('idCantidadPersonasExperiencia');
+            if (comboCantidad1.value === 'uno') {
+                let tdImg1 = document.createElement('img');
+                tdImg1.src = 'img/uno.png';
+                tdImg1.alt = 'uno'
+                celdaLista1.appendChild(tdImg1);
+            }
+            if (comboCantidad1.value === 'dos') {
+                let tdImg2 = document.createElement('img');
+                tdImg2.src = 'img/dos.png';
+                tdImg2.alt = 'dos'
+                celdaLista1.appendChild(tdImg2);
+            }
+            if (comboCantidad1.value === 'muchos') {
+                let tdImg3 = document.createElement('img');
+                tdImg3.src = 'img/muchos.png';
+                tdImg3.alt = 'muchos'
+                celdaLista1.appendChild(tdImg3);
+            }
+
             lista1.appendChild(liPrecio1);
 
             celdaLista1.appendChild(lista1);
 
-            
+            // Agregar id único al <td>
+            celdaLista1.id = 'td_' + contadorTd; 
+            contadorTd++;
+
+            // Agregar onclick al <td>
+            celdaLista1.addEventListener("click", function() {
+                valorExperiencia(celdaLista1.id);
+            });
+
+            // Segunda celda
             if (i + 1 < experiencias.length) {
                 let celdaLista2 = fila.insertCell();
-                celdaLista2.addEventListener("click", valorExperiencia);
                 let lista2 = document.createElement('ul');
                 let unaExperiencia2 = experiencias[i + 1];
 
-                lista2.id = 'ul_' + contadorUl; 
-                contadorUl++;
-
-
                 let liTitulo2 = document.createElement('li');
                 liTitulo2.textContent = unaExperiencia2.titulo;
-                liTitulo2.idName = "experienciaTitulo";
+                liTitulo2.id = "experienciaTitulo";  // Cambiado de idName a id
                 lista2.appendChild(liTitulo2);
 
                 let liDescripcion2 = document.createElement('li');
@@ -225,15 +267,68 @@ function actualizarTablaExperiencias() {
                 liPrecio2.textContent = "$" + unaExperiencia2.precio;
                 lista2.appendChild(liPrecio2);
 
+                let comboCantidad1 = document.getElementById('idCantidadPersonasExperiencia');
+            if (comboCantidad1.value === 'uno') {
+                let tdImg1 = document.createElement('img');
+                tdImg1.src = 'img/uno.png';
+                tdImg1.alt = 'uno'
+                celdaLista1.appendChild(tdImg1);
+            }
+            if (comboCantidad1.value === 'dos') {
+                let tdImg2 = document.createElement('img');
+                tdImg2.src = 'img/dos.png';
+                tdImg2.alt = 'dos'
+                celdaLista1.appendChild(tdImg2);
+            }
+            if (comboCantidad1.value === 'muchos') {
+                let tdImg3 = document.createElement('img');
+                tdImg3.src = 'img/muchos.png';
+                tdImg3.alt = 'muchos'
+                celdaLista1.appendChild(tdImg3);
+            }
+
                 celdaLista2.appendChild(lista2);
+
+                // Agregar id único al <td>
+                celdaLista2.id = 'td_' + contadorTd; 
+                contadorTd++;
+
+                // Agregar onclick al <td>
+                celdaLista2.addEventListener("click", function() {
+                    valorExperiencia(celdaLista2.id);
+                });
             }
         }
     }
 }
 
 
-function valorExperiencia() {
-    let valor = liTitulo1.getElementById()
+// obtener valor del id de la ul seleccionada
+function valorExperiencia(idLista) {
+    experienciaSeleccionada = idLista
+    alert(experienciaSeleccionada)
+}
+
+
+// mostrar mas exp mas cara
+
+function expMasCara () {
+    let opcionPersonas = document.getElementById('idCantidadPersonasCategoria').value;
+    if (opcionPersonas == 'uno') {
+        let copiaOrdenada = sistema.ordenarCopiaExpPorPrecio();
+        alert(JSON.stringify(copiaOrdenada, null, 2));
+    }
+
+    // if(opcionPersonas == 'uno') {
+    //     //...
+    // }
+    // if(opcionPersonas == 'dos') {
+    //     //...
+    // }
+    // if(opcionPersonas == 'varias') {
+    //     //...
+    // }
+    
 }
 
 
