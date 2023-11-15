@@ -33,9 +33,10 @@ function agregarComprador() {
         let mailComprador = document.getElementById("idMail").value.toUpperCase();
         if (experienciaSeleccionada){
             sistema.agregarCompradores(new Comprador(nombreComprador,mailComprador,experienciaSeleccionada));
+            alert( 'compra registrada' )
             experienciaSeleccionada = null
         } else {
-            alert ('Tienes que elejir una experiencia para comprar')
+            alert ('Tienes que elegir una experiencia para comprar')
         }
         formularioComprador.reset();
     }
@@ -50,8 +51,8 @@ function agregarExperiencia() {
         let precio = document.getElementById('idPrecioExperiencia').value;
         let cantidad = document.getElementById('idCantidadPersonasExperiencia').value;
         let categoria = document.getElementById('idCategoriaExperiencia').value;
-        if(sistema.existeExperienciaIgual(titulo,descripcion,precio)) {
-            alert ("Ya hay una experiencia identica")
+        if(sistema.existeExperienciaIgual(titulo)) {
+            alert ("No se puede agregar otro titulo igual")
         } else {
         sistema.agregarExperiencia(new Experiencia(titulo, descripcion, precio, cantidad, categoria));
         formularioExperiencia.reset();
@@ -116,8 +117,10 @@ function cargarExperiencias(){
     let comboFiltro = document.getElementById('idComboCategoriasIzquierda');
     let seleccion = comboFiltro.value;
     let experienciasPorCategoria = sistema.devolverExpPorCat(seleccion);
-    actualizarTablaExperiencias(experienciasPorCategoria);    
+    actualizarTablaExperiencias(experienciasPorCategoria);    // error con tema filtros , depende de la tabla actualizarTabla. 
+    // Le estoy pasando el array copia que tiene todas las experiencias de la categoria seleccionada en el combo. 
 }
+
 
 
 
@@ -150,11 +153,11 @@ function eliminarCategoria() {
     let posEligido = document.getElementById('idComboCategoriasAbajo').selectedIndex;
     if (posEligido != -1) {
         let categoriaAEliminar = sistema.devolverCategorias()[posEligido].nombre;
-        if (sistema.existeCategoriaEnExperiencias(categoriaAEliminar)){
-            alert('No puedes eliminar esta categoria porque hay al menos una experiencia con ella');
+        if (sistema.existeExperienciaComprada(experienciaAEliminar)) {
+            alert('No puedes eliminar esta experiencia porque ha sido comprada.');
         } else {
-            sistema.eliminarCategoria(posEligido);
-            actualizarCombosTotales();
+            sistema.eliminarExperiencia(posEligido);
+            actualizarTablaExperiencias();
         }
     } else {
         alert ('Accion no valida')
@@ -167,7 +170,7 @@ function eliminarExperiencia() {
     
     if (posEligido !== -1) {
         let experienciaAEliminar = sistema.devolverExperiencias()[posEligido];
-        let categoriaExperiencia = experienciaAEliminar.categoria;
+        let categoriaExperiencia = experienciaAEliminar.id;
 
         if (sistema.existeExperienciaComprada(categoriaExperiencia)) {
             alert('No puedes eliminar esta experiencia porque la categoría está en uso.');
@@ -186,14 +189,14 @@ function eliminarExperiencia() {
 function actualizarTablaExperiencias(experiencias) {
     let tablaExperiencia = document.getElementById('idTabla');
     tablaExperiencia.innerHTML = '';
-    // experiencias = sistema.devolverExperiencias();
 
     let contadorTd = 1;
 
-    if (experiencias.length === 0) {
+    if (sistema.listaExperiencias === 0) { // aca esta el error, antes era [  if (experiencias === 0)  ], donde 'experiencias' era => [  experiencias = sistema.devolverExperiencias();  ]
+                                                // este cambio fue hecho para al momento de filtrarlo poder pasar una exp por parametro y asi actualizar la lista...
         tablaExperiencia.innerHTML = "No hay experiencias";
     } else {
-        for (let i = 0; i < experiencias.length; i += 2) { 
+        for (let i = 0; i < experiencias.length; i += 2) {
             let fila = tablaExperiencia.insertRow();
 
             // Primer celda
@@ -208,29 +211,28 @@ function actualizarTablaExperiencias(experiencias) {
 
             let liDescripcion1 = document.createElement('li');
             liDescripcion1.textContent = unaExperiencia1.descripcion;
-            liDescripcion1.className = 'experienciasDescripcion'; 
+            liDescripcion1.className = 'experienciasDescripcion';
             lista1.appendChild(liDescripcion1);
 
             let liPrecio1 = document.createElement('li');
             liPrecio1.textContent = "$" + unaExperiencia1.precio;
 
-            let comboCantidad1 = document.getElementById('idCantidadPersonasExperiencia');
-            if (comboCantidad1.value === 'uno') {
+            if (unaExperiencia1.cantidad === 'uno') {
                 let tdImg1 = document.createElement('img');
                 tdImg1.src = 'img/uno.png';
-                tdImg1.alt = 'uno'
+                tdImg1.alt = 'uno';
                 celdaLista1.appendChild(tdImg1);
             }
-            if (comboCantidad1.value === 'dos') {
+            if (unaExperiencia1.cantidad === 'dos') {
                 let tdImg2 = document.createElement('img');
                 tdImg2.src = 'img/dos.png';
-                tdImg2.alt = 'dos'
+                tdImg2.alt = 'dos';
                 celdaLista1.appendChild(tdImg2);
             }
-            if (comboCantidad1.value === 'muchos') {
+            if (unaExperiencia1.cantidad === 'varias') {
                 let tdImg3 = document.createElement('img');
                 tdImg3.src = 'img/muchos.png';
-                tdImg3.alt = 'muchos'
+                tdImg3.alt = 'varias';
                 celdaLista1.appendChild(tdImg3);
             }
 
@@ -239,12 +241,14 @@ function actualizarTablaExperiencias(experiencias) {
             celdaLista1.appendChild(lista1);
 
             // Agregar id único al <td>
-            celdaLista1.id = 'td_' + contadorTd; 
+            celdaLista1.id = 'td_' + contadorTd;
             contadorTd++;
 
             // Agregar onclick al <td>
-            celdaLista1.addEventListener("click", function() {
+            celdaLista1.addEventListener("click", function () {
                 valorExperiencia(celdaLista1.id);
+                eliminarClaseFondo();
+                agregarClaseFondo(celdaLista1.id);
             });
 
             // Segunda celda
@@ -260,54 +264,68 @@ function actualizarTablaExperiencias(experiencias) {
 
                 let liDescripcion2 = document.createElement('li');
                 liDescripcion2.textContent = unaExperiencia2.descripcion;
-                liDescripcion2.className = 'experienciasDescripcion'; 
+                liDescripcion2.className = 'experienciasDescripcion';
                 lista2.appendChild(liDescripcion2);
 
                 let liPrecio2 = document.createElement('li');
                 liPrecio2.textContent = "$" + unaExperiencia2.precio;
                 lista2.appendChild(liPrecio2);
 
-                let comboCantidad1 = document.getElementById('idCantidadPersonasExperiencia');
-            if (comboCantidad1.value === 'uno') {
-                let tdImg1 = document.createElement('img');
-                tdImg1.src = 'img/uno.png';
-                tdImg1.alt = 'uno'
-                celdaLista1.appendChild(tdImg1);
-            }
-            if (comboCantidad1.value === 'dos') {
-                let tdImg2 = document.createElement('img');
-                tdImg2.src = 'img/dos.png';
-                tdImg2.alt = 'dos'
-                celdaLista1.appendChild(tdImg2);
-            }
-            if (comboCantidad1.value === 'muchos') {
-                let tdImg3 = document.createElement('img');
-                tdImg3.src = 'img/muchos.png';
-                tdImg3.alt = 'muchos'
-                celdaLista1.appendChild(tdImg3);
-            }
+                if (unaExperiencia2.cantidad === 'uno') {
+                    let tdImg1 = document.createElement('img');
+                    tdImg1.src = 'img/uno.png';
+                    tdImg1.alt = 'uno';
+                    celdaLista2.appendChild(tdImg1);
+                }
+                if (unaExperiencia2.cantidad === 'dos') {
+                    let tdImg2 = document.createElement('img');
+                    tdImg2.src = 'img/dos.png';
+                    tdImg2.alt = 'dos';
+                    celdaLista2.appendChild(tdImg2);
+                }
+                if (unaExperiencia2.cantidad === 'varias') {
+                    let tdImg3 = document.createElement('img');
+                    tdImg3.src = 'img/muchos.png';
+                    tdImg3.alt = 'varias';
+                    celdaLista2.appendChild(tdImg3);
+                }
 
                 celdaLista2.appendChild(lista2);
 
                 // Agregar id único al <td>
-                celdaLista2.id = 'td_' + contadorTd; 
+                celdaLista2.id = 'td_' + contadorTd;
                 contadorTd++;
 
                 // Agregar onclick al <td>
-                celdaLista2.addEventListener("click", function() {
+                celdaLista2.addEventListener("click", function () {
                     valorExperiencia(celdaLista2.id);
+                    eliminarClaseFondo();
+                    agregarClaseFondo(celdaLista2.id);
                 });
             }
         }
     }
 }
 
-
 // obtener valor del id de la ul seleccionada
 function valorExperiencia(idLista) {
-    experienciaSeleccionada = idLista
-    alert(experienciaSeleccionada)
+    experienciaSeleccionada = idLista;
 }
+
+function eliminarClaseFondo() {
+    let total = document.querySelectorAll('.opcionSeleccionada');
+    total.forEach(td => {
+        td.classList.remove('opcionSeleccionada');
+    });
+}
+
+function agregarClaseFondo(idLista) {
+    document.getElementById(idLista).classList.add('opcionSeleccionada');
+}
+
+
+
+
 
 
 // mostrar mas exp mas cara
@@ -330,7 +348,6 @@ function expMasCara () {
     // }
     
 }
-
 
 
 
