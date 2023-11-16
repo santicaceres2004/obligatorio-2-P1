@@ -5,8 +5,9 @@ class Sistema {
         this.listaExperiencias = new Array();
         this.listaCategorias = new Array();
         this.listaCompradores = new Array();
-        // this.listaExperienciasComprada = new Array();
+        this.listaExperienciasCompradas = new Array();
     }
+
 
     agregarExperiencia(unaExperiencia) { 
         this.listaExperiencias.push(unaExperiencia)
@@ -22,6 +23,10 @@ class Sistema {
 
     devolverExperiencias() {
         return this.listaExperiencias
+    }
+
+    devolverCompradores() {
+        return this.listaCompradores
     }
 
     eliminarExperiencia(index) {
