@@ -12,6 +12,7 @@ function inicio() {
 
                                                             // AGREGAR CATEGORIAS, EXPERIENCIAS Y COMPRADORES
 
+                                                            
 function agregarCategoria() {
     let formularioCategoria = document.getElementById('idFormCategoria');
     if (formularioCategoria.reportValidity()) {
@@ -94,38 +95,6 @@ function cargarCombosExperiencia() {
     }
 }
 
-function cargarCombosFiltro() {
-    let comboFiltro = document.getElementById('idComboCategoriasIzquierda');
-    comboFiltro.innerHTML = '';
-    let categorias = sistema.devolverCategorias();
-    for (let unaCategoria of categorias) {
-        let nodoTexto = document.createTextNode(unaCategoria.nombre);
-        let nodoOption = document.createElement('option');
-        nodoOption.value = unaCategoria.nombre;
-        nodoOption.appendChild(nodoTexto);
-        comboFiltro.appendChild(nodoOption); 
-    }
-
-
-       comboFiltro.addEventListener('change', cargarExperiencias);
-        
-
-
-}
-
-function cargarExperiencias(){
-    let comboFiltro = document.getElementById('idComboCategoriasIzquierda');
-    let seleccion = comboFiltro.value;
-    let experienciasPorCategoria = sistema.devolverExpPorCat(seleccion);
-    actualizarTablaExperiencias(experienciasPorCategoria);    // error con tema filtros , depende de la tabla actualizarTabla. 
-    // Le estoy pasando el array copia que tiene todas las experiencias de la categoria seleccionada en el combo. 
-}
-
-
-
-
-
-
 function comboEliminarExperiencia(){
     let comboEliminarExperiencia = document.getElementById('idComboBajaExperiencia');
     comboEliminarExperiencia.innerHTML = '';
@@ -147,32 +116,76 @@ function actualizarCombosTotales () {
     comboEliminarExperiencia();
 }
 
+
+                                                                    // FILTROS
+function cargarCombosFiltro() {
+    let comboFiltro = document.getElementById('idComboCategoriasIzquierda');
+    comboFiltro.innerHTML = '';
+    let categorias = sistema.devolverCategorias();
+    for (let unaCategoria of categorias) {
+        let nodoTexto = document.createTextNode(unaCategoria.nombre);
+        let nodoOption = document.createElement('option');
+        nodoOption.value = unaCategoria.nombre;
+        nodoOption.appendChild(nodoTexto);
+        comboFiltro.appendChild(nodoOption); 
+    }
+
+    comboFiltro.addEventListener("change", filtrarExperienciasPorCategoria);
+}
+
+function filtrarExperienciasPorCategoria() {
+    let categoriaSeleccionada = document.getElementById("idComboCategoriasIzquierda").value;
+  
+    let filtrada = sistema.devolverExpPorCat(categoriaSeleccionada);
+    actualizarTablaExperiencias(filtrada);
+  }
+
+
+function cargarComboPersonasFiltro() {
+    let comboPersonas = document.getElementById('idCantidadPersonasCategoria');
+    comboPersonas.addEventListener("change", filtrarExperienciasPorCantPersonas);
+}
+
+function filtrarExperienciasPorCantPersonas() {
+    let cantPersonasSeleccionada = document.getElementById("idCantidadPersonasCategoria").value;
+      
+    let filtrada = sistema.devolverExpPorCantPersonas(cantPersonasSeleccionada);
+    actualizarTablaExperiencias(filtrada);
+}
+
+
+
+
                                                             // ELIMINAR CATEGORIAS Y EXPERIENCIAS
 
 function eliminarCategoria() {
-    let posEligido = document.getElementById('idComboCategoriasAbajo').selectedIndex;
+    let posEligido = document.getElementById(
+      "idComboCategoriasAbajo"
+    ).selectedIndex;
+  
     if (posEligido != -1) {
-        let categoriaAEliminar = sistema.devolverCategorias()[posEligido].nombre;
-        if (sistema.existeExperienciaComprada(experienciaAEliminar)) {
-            alert('No puedes eliminar esta experiencia porque ha sido comprada.');
-        } else {
-            sistema.eliminarExperiencia(posEligido);
-            actualizarTablaExperiencias();
-        }
+      let categoriaAEliminar = sistema.devolverCategorias()[posEligido].nombre;
+      if (sistema.existeCategoriaEnExperiencias(categoriaAEliminar)) {
+        alert("No puedes eliminar esta categoria porque ha sido utilizada.");
+      } else {
+        sistema.eliminarCategoria(posEligido);
+        actualizarCombosTotales();
+        alert("La categoría ha sido eliminada.");
+      }
     } else {
-        alert ('Accion no valida')
+      alert("Accion no valida");
     }
-}
+  }
 
 
 function eliminarExperiencia() {
     let posEligido = document.getElementById('idComboBajaExperiencia').selectedIndex;
-    
+ 
     if (posEligido !== -1) {
         let experienciaAEliminar = sistema.devolverExperiencias()[posEligido];
-        let categoriaExperiencia = experienciaAEliminar.id;
+        let tituloExperienciaAEliminar = experienciaAEliminar.titulo;
 
-        if (sistema.existeExperienciaComprada(categoriaExperiencia)) {
+        if (sistema.existeExperienciaComprada(tituloExperienciaAEliminar)) {
             alert('No puedes eliminar esta experiencia porque la categoría está en uso.');
         } else {
             sistema.eliminarExperiencia(posEligido);
@@ -184,16 +197,17 @@ function eliminarExperiencia() {
 }
 
 
+
                                                             // TABLA EXPERIENCIAS
 
 function actualizarTablaExperiencias(experiencias) {
     let tablaExperiencia = document.getElementById('idTabla');
     tablaExperiencia.innerHTML = '';
+    // experiencias = sistema.devolverExperiencias();
 
     let contadorTd = 1;
 
-    if (sistema.listaExperiencias === 0) { // aca esta el error, antes era [  if (experiencias === 0)  ], donde 'experiencias' era => [  experiencias = sistema.devolverExperiencias();  ]
-                                                // este cambio fue hecho para al momento de filtrarlo poder pasar una exp por parametro y asi actualizar la lista...
+    if (sistema.listaExperiencias === 0) {  // aca esta la duda
         tablaExperiencia.innerHTML = "No hay experiencias";
     } else {
         for (let i = 0; i < experiencias.length; i += 2) {
@@ -307,11 +321,16 @@ function actualizarTablaExperiencias(experiencias) {
     }
 }
 
+let experienciaSeleccionada = null;
 // obtener valor del id de la ul seleccionada
 function valorExperiencia(idLista) {
     experienciaSeleccionada = idLista;
+    alert(experienciaSeleccionada);
+    
 }
 
+
+                                // PINTAR - DESPINTAR EXP SELECCIONADA
 function eliminarClaseFondo() {
     let total = document.querySelectorAll('.opcionSeleccionada');
     total.forEach(td => {
@@ -348,6 +367,3 @@ function expMasCara () {
     // }
     
 }
-
-
-
