@@ -76,33 +76,49 @@ class Sistema {
 
     existeExperienciaComprada(unaExperiencia) {
         let existe = false;
-        for (let pos = 0; pos<this.listaCompradores.length&&existe;pos++){
+        for (let pos = 0; pos<this.listaCompradores.length&&!existe;pos++){
             let experienciaComprada = this.listaCompradores[pos];
             if(experienciaComprada.compra == unaExperiencia) {
-                existe = true
+                existe = true;
             }
         }
         return existe;
     }
+    
 
     ordenarCopiaExpPorPrecio () {
         let copia = new Array() ;
         for (let unaExperiencia of this.listaExperiencias){
             copia.push(unaExperiencia)
         }
-        return copia.sort(function (a,b) {return a.compararPrecio(b);})
-
+        return copia.sort(function (a, b) {
+            if (a.compararPrecio && b.compararPrecio) {
+                return a.compararPrecio(b);
+            }
+            return 0;
+        });
     }
+    
 
-    devolverExpPorCat (NombreunaCategoria) {
-        let copia = new Array() ;
-        for (let unaExperiencia of this.listaExperiencias){
-            if(unaExperiencia.categoria.nombre == NombreunaCategoria)
-            copia.push(unaExperiencia)
+    devolverExpPorCantPersonas(cantPersonas) {
+        let copia = new Array();
+        if (cantPersonas === "todos") {
+          return this.listaExperiencias;
+        }
+        for (let unaExperiencia of this.listaExperiencias) {
+          if (unaExperiencia.cantidad == cantPersonas) copia.push(unaExperiencia);
         }
         return copia;
+        }
 
-    }
+        devolverExpPorCat(NombreunaCategoria) {
+            let copia = new Array();
+            for (let unaExperiencia of this.listaExperiencias) {
+              if (unaExperiencia.categoria == NombreunaCategoria)
+                copia.push(unaExperiencia);
+            }
+            return copia;
+            }
 }
 
 class Categoria {
