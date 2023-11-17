@@ -147,6 +147,7 @@ function filtrarExperienciasPorCategoria() {
   
     let filtrada = sistema.devolverExpPorCat(categoriaSeleccionada);
     actualizarTablaExperiencias(filtrada);
+    mostrarDetalles();
   }
 
 function filtrarExperienciasPorCantPersonas() {
@@ -156,9 +157,6 @@ function filtrarExperienciasPorCantPersonas() {
     actualizarTablaExperiencias(filtrada);
 }
 
-function infoDeExperiencaPorCategoria (){
-    let listaExpPorCategoria = actualizarTablaExperiencias(filtrada)
-}
 
 
                                                             // ELIMINAR CATEGORIAS Y EXPERIENCIAS
@@ -436,18 +434,11 @@ function mostrarEnInformes() { // PREGUNTAR PORQUE NO SE ACTUALIZA LA TABLA EN E
         let masFrecuente = experienciaMasFrecuente();
         let listaComprasUl = document.getElementById('idExperienciasMasCompradas');
     
-        // Limpiar la lista antes de agregar nuevos elementos
         listaComprasUl.innerHTML = '';
     
-        // Verificar si hay alguna experiencia más frecuente
         if (masFrecuente) {
-            // Crear un elemento li
             let nuevoLi = document.createElement('li');
-    
-            // Establecer el contenido del li con la experiencia más frecuente
-            nuevoLi.textContent = 'Experiencia más frecuente: ' + masFrecuente;
-    
-            // Agregar el li a la lista
+            nuevoLi.textContent = '• Experiencia más comprada: ' + masFrecuente;
             listaComprasUl.appendChild(nuevoLi);
         }
     }
@@ -466,3 +457,49 @@ function ComboFiltroPrecio () {
 
     }
 }
+
+
+function mostrarDetalles() {
+    const date = new Date
+    let listaCompras = document.getElementById('idListaCompras');
+    let categoriaSeleccionada = document.getElementById("idComboCategoriasIzquierda").value;
+    let filtrada = sistema.devolverExpPorCat(categoriaSeleccionada);
+    let listaCompradores = sistema.devolverCompradores();
+
+    listaCompras.innerHTML = '';
+
+    for (comprador of listaCompradores) {
+        let tituloCompra = comprador.compra;
+
+        // Bucle for para buscar la experiencia correspondiente en la lista filtrada
+        let experienciaCorrespondiente = null;
+        for (let i = 0; i < filtrada.length; i++) {
+            if (filtrada[i].titulo === tituloCompra) {
+                experienciaCorrespondiente = filtrada[i];
+                break; // Si se encuentra la experiencia, salir del bucle
+            }
+        }
+
+        if (experienciaCorrespondiente) {
+            let nuevoLi = document.createElement('li');
+            nuevoLi.textContent = '• Nombre: ' + comprador.nombre + ' Mail: ' + comprador.mail + ' Fecha: ' + fecha() + ' Hora: ' + hora();
+            
+            // Agregar el nuevo elemento li a la listaCompras
+            listaCompras.appendChild(nuevoLi);
+        }
+    }
+}
+
+function fecha() {
+    const date = new Date;
+    let fecha = date.toLocaleDateString();
+    return fecha;
+}
+
+function hora() {
+    const date = new Date;
+    let hora = date.toLocaleTimeString();
+    return hora;
+}
+
+
