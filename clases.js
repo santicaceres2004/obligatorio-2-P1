@@ -171,24 +171,14 @@ class Experiencia {
         this.categoria = unaCategoria;
     }
 
-    compararPrecio (otraExperiencia) {
-        return this.precio - otraExperiencia.precio;
-
-    }
-
-    // no usado todavia
-    compararPersonas(otraExperiencia) {
-        return this.cantidad - otraExperiencia.cantidad; //(los valores son string)
-    }
-
 }
 
 class Comprador {
-    constructor(unNombre,unMail,unaCompra) { 
+    constructor(unNombre,unMail,unaCompra, unaFechaYHora) { 
         this.nombre = unNombre;
-        this.mail = unMail
-        this.compra = unaCompra
+        this.mail = unMail;
+        this.compra = unaCompra;
+        this.fecha = unaFechaYHora
     }
-}
 
-//'gastronomia', 'cena para 2'
+}
