@@ -8,6 +8,8 @@ function inicio() {
     document.getElementById('idBotonAltaExperiencia').addEventListener('click', agregarExperiencia);
     document.getElementById('idBotonBajaExperiencia').addEventListener('click', eliminarExperiencia);
     document.getElementById("idBotonComprar").addEventListener("click", agregarComprador);
+    document.getElementById('idCantidadPersonasCategoria').addEventListener("change", filtrarExperienciasPorCantPersonas);
+    document.getElementById('idOrdenPrecio').addEventListener("change", ComboFiltroPrecio);
 }
 
                                                             // AGREGAR CATEGORIAS, EXPERIENCIAS Y COMPRADORES
@@ -36,6 +38,8 @@ function agregarComprador() {
             sistema.agregarCompradores(new Comprador(nombreComprador,mailComprador,experienciaSeleccionada));
             alert( 'compra registrada' )
             experienciaSeleccionada = null
+            eliminarClaseFondo();
+            mostrarEnInformes();
         } else {
             alert ('Tienes que elegir una experiencia para comprar')
         }
@@ -43,6 +47,8 @@ function agregarComprador() {
     }
 
 }
+
+
 
 function agregarExperiencia() {
     let formularioExperiencia = document.getElementById('idFormExperiencia');
@@ -59,9 +65,12 @@ function agregarExperiencia() {
         formularioExperiencia.reset();
         actualizarTablaExperiencias(sistema.devolverExperiencias());
         actualizarCombosTotales ();
+        informes ();
+        
         }
     }
 }
+
 
 
 
@@ -140,12 +149,6 @@ function filtrarExperienciasPorCategoria() {
     actualizarTablaExperiencias(filtrada);
   }
 
-
-function cargarComboPersonasFiltro() {
-    let comboPersonas = document.getElementById('idCantidadPersonasCategoria');
-    comboPersonas.addEventListener("change", filtrarExperienciasPorCantPersonas);
-}
-
 function filtrarExperienciasPorCantPersonas() {
     let cantPersonasSeleccionada = document.getElementById("idCantidadPersonasCategoria").value;
       
@@ -153,15 +156,16 @@ function filtrarExperienciasPorCantPersonas() {
     actualizarTablaExperiencias(filtrada);
 }
 
-
+function infoDeExperiencaPorCategoria (){
+    let listaExpPorCategoria = actualizarTablaExperiencias(filtrada)
+}
 
 
                                                             // ELIMINAR CATEGORIAS Y EXPERIENCIAS
 
 function eliminarCategoria() {
     let posEligido = document.getElementById(
-      "idComboCategoriasAbajo"
-    ).selectedIndex;
+      "idComboCategoriasAbajo").selectedIndex;
   
     if (posEligido != -1) {
       let categoriaAEliminar = sistema.devolverCategorias()[posEligido].nombre;
@@ -207,7 +211,7 @@ function actualizarTablaExperiencias(experiencias) {
 
     let contadorTd = 1;
 
-    if (sistema.listaExperiencias === 0) {  // aca esta la duda
+    if (sistema.listaExperiencias === 0) {  
         tablaExperiencia.innerHTML = "No hay experiencias";
     } else {
         for (let i = 0; i < experiencias.length; i += 2) {
@@ -260,7 +264,7 @@ function actualizarTablaExperiencias(experiencias) {
 
             // Agregar onclick al <td>
             celdaLista1.addEventListener("click", function () {
-                valorExperiencia(celdaLista1.id);
+                valorExperiencia(liTitulo1.textContent);
                 eliminarClaseFondo();
                 agregarClaseFondo(celdaLista1.id);
             });
@@ -312,7 +316,7 @@ function actualizarTablaExperiencias(experiencias) {
 
                 // Agregar onclick al <td>
                 celdaLista2.addEventListener("click", function () {
-                    valorExperiencia(celdaLista2.id);
+                    valorExperiencia(liTitulo2.textContent);
                     eliminarClaseFondo();
                     agregarClaseFondo(celdaLista2.id);
                 });
@@ -366,4 +370,99 @@ function expMasCara () {
     //     //...
     // }
     
+}
+
+
+function precioExpMasCara(){
+    let experienciasListaTotal = sistema.devolverExperiencias();
+    let precioMaximo = 0;
+    for( let experiencias of experienciasListaTotal) {
+        let precioExperiencias = experiencias.precio;
+        if (precioExperiencias > precioMaximo) {
+            precioMaximo = precioExperiencias
+        }
+    }
+    return precioMaximo;
+}
+
+function informes () {
+    let informe = document.getElementById('idExperienciaMasCara');
+    let precioMaximo = precioExpMasCara();
+    if(sistema.listaExperiencias.length > 0){
+    informe.innerHTML = precioMaximo;
+    }
+}
+
+
+// FUNCIONALIDAD DE EXPERIENCIA MAS COMPRADA
+function contarCompras() {
+    let listaCompradores = sistema.devolverCompradores();
+    
+    // Objeto para realizar un seguimiento de la cantidad de compras por título
+    let contadorTitulos = {};
+
+    // Iterar sobre la lista de compradores y contar las compras por título
+    for (let comprador of listaCompradores) {
+        let titulo = comprador.compra;
+
+        if (contadorTitulos[titulo]) {
+            contadorTitulos[titulo]++;
+        } else {
+            contadorTitulos[titulo] = 1;
+        }
+    }
+
+    return contadorTitulos;
+}
+
+function experienciaMasFrecuente() {
+    let contadorTitulos = contarCompras();
+
+    // Encontrar el título más frecuente
+    let tituloMasFrecuente = null;
+    let maxApariciones = 0;
+
+    for (let titulo in contadorTitulos) {
+        if (contadorTitulos[titulo] > maxApariciones) {
+            maxApariciones = contadorTitulos[titulo];
+            tituloMasFrecuente = titulo;
+        }
+    }
+
+    return tituloMasFrecuente;
+}
+
+function mostrarEnInformes() { // PREGUNTAR PORQUE NO SE ACTUALIZA LA TABLA EN EL HTML.
+        let masFrecuente = experienciaMasFrecuente();
+        let listaComprasUl = document.getElementById('idExperienciasMasCompradas');
+    
+        // Limpiar la lista antes de agregar nuevos elementos
+        listaComprasUl.innerHTML = '';
+    
+        // Verificar si hay alguna experiencia más frecuente
+        if (masFrecuente) {
+            // Crear un elemento li
+            let nuevoLi = document.createElement('li');
+    
+            // Establecer el contenido del li con la experiencia más frecuente
+            nuevoLi.textContent = 'Experiencia más frecuente: ' + masFrecuente;
+    
+            // Agregar el li a la lista
+            listaComprasUl.appendChild(nuevoLi);
+        }
+    }
+    
+    
+
+// ORDENAR POR PRECIO ASCENDETE Y DESCENDENTE
+function ComboFiltroPrecio () {
+    let combo = document.getElementById('idOrdenPrecio');
+    let arrayOrdenado = sistema.devolverPorPrecioAscendente();
+    let arrayOrdenadoDesc = sistema.devolverPorPrecioDescendente();
+    if(combo.value == '1') {
+        actualizarTablaExperiencias(arrayOrdenado)
+    } else {
+        actualizarTablaExperiencias(arrayOrdenadoDesc)
+
+    }
 }
