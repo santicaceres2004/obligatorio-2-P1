@@ -124,6 +124,30 @@ class Sistema {
             }
             return copia;
             }
+
+            devolverPorPrecioDescendente(precioCategoria) {
+                let copia = new Array();
+                for (let unaExperiencia of this.listaExperiencias) {
+                    copia.push(unaExperiencia);
+                }
+            
+                return copia.sort(function (a, b) {
+                    return b.precio - a.precio;
+                });
+            }
+            
+            devolverPorPrecioAscendente() {
+                let copia = new Array();
+                for (let unaExperiencia of this.listaExperiencias) {
+                    copia.push(unaExperiencia);
+                }
+                return copia.sort(function(a, b) {
+                    return a.precio - b.precio;
+                });
+            }
+            
+            
+
 }
 
 class Categoria {
