@@ -1,0 +1,19 @@
+                    
+                    
+
+
+                    //  Cosas para preguntar:
+
+ - Chequear si hay que, cuando se apreta el botón de comprar, para actualizar la información detallada 
+    de la categoría tengo que atrapar el título de la experiencia de la tabla seleccionada
+    para comprar, recorrer el array de experiencias, fijarse que sea igual, 
+    agarrar la categoría de la experiencia comprada y ese es el valor el cual 
+    tengo que tomar para que se actualice la información detallada cuando 
+    le doy al botón de comprar. Porque actualmente el valor lo toma 
+    del combo de la izquierda correspondiente al filtro que siempre es 
+    la primera experiencia añadida. // ver video
+
+ - Ver tema de eliminarClaseFondo cuando vuelvo a seleccionar una exp. // no tiene por
+
+ - Que se muestren si hay experiencias copradas las mismas cantidad de veces en INFORMES / experiencias mas compradas.
+
