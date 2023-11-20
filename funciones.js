@@ -17,6 +17,9 @@ function inicio() {
 
 function agregarCategoria() {
     let formularioCategoria = document.getElementById('idFormCategoria');
+    let categorias = sistema.devolverCategorias();
+    let botonEliminar = document.getElementById('idBotonBajaCategoria');
+    let botonAgregarExp =document.getElementById('idBotonAltaExperiencia')
     if (formularioCategoria.reportValidity()) {
         let nombre = document.getElementById('idNombreCategoria').value.toUpperCase();
         let detalle = document.getElementById('idDetallesCategoria').value.toUpperCase();
@@ -26,6 +29,11 @@ function agregarCategoria() {
             sistema.agregarCategoria(new Categoria(nombre, detalle));
             formularioCategoria.reset();
             actualizarCombosTotales();
+
+        }
+        if (categorias.length > 0) {
+            botonEliminar.disabled =!botonEliminar.disabled
+            botonAgregarExp.disabled =!botonAgregarExp.disabled
         }
     }
 }
@@ -55,7 +63,7 @@ function actualizarInformes() {
     mostrarDetalles();
     let categoriaSeleccionada = document.getElementById("idComboCategoriasIzquierda").value;
     let tituloDeSeccion = document.getElementById('idDetallesCualCategoria');
-    tituloDeSeccion.innerHTML = 'Información detallada de la categoría ' + categoriaSeleccionada;
+    tituloDeSeccion.innerHTML = 'Información detallada de la categoría ' + categoriaSeleccionada  ;
 }
 
 
@@ -63,8 +71,11 @@ function actualizarInformes() {
 
 function agregarExperiencia() {
     let formularioExperiencia = document.getElementById('idFormExperiencia');
+    let devolverExp = sistema.devolverExperiencias();
+    let btnEliminar = document.getElementById('idBotonBajaExperiencia');
+    let btnComprador = document.getElementById('idBotonComprar');
     if (formularioExperiencia.reportValidity()) {
-        let titulo = document.getElementById('idTituloExperiencia').value;
+        let titulo = document.getElementById('idTituloExperiencia').value.toUpperCase();
         let descripcion = document.getElementById('idDescripcionExperiencia').value;
         let precio = document.getElementById('idPrecioExperiencia').value;
         let cantidad = document.getElementById('idCantidadPersonasExperiencia').value;
@@ -80,6 +91,10 @@ function agregarExperiencia() {
             actualizarCombosTotales();
             informes();
         }
+    }
+    if (devolverExp.length > 0) {
+        btnEliminar.disabled =!btnEliminar.disabled
+        btnComprador.disabled =!btnComprador.disabled
     }
 }
 
@@ -193,6 +208,7 @@ function eliminarExperiencia() {
             sistema.eliminarExperiencia(posEligido);
             actualizarTablaExperiencias(sistema.devolverExperiencias());
             actualizarCombosTotales();
+            alert('La experiencia ha sido eliminada.')
         }
     } else {
         alert('Acción no válida');
